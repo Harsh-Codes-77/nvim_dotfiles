@@ -5,7 +5,7 @@ return {
     require("toggleterm").setup({
       size = 20,
       open_mapping = [[<c-t>]], -- Press Ctrl + \ to toggle terminal
-      direction = "float", -- 'vertical' | 'horizontal' | 'tab' | 'float'
+      direction = "vertical", -- 'vertical' | 'horizontal' | 'tab' | 'float'
       float_opts = { border = "curved",
       },
     })

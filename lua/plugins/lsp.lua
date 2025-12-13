@@ -16,19 +16,31 @@ return {
     -- 1. Setup Mason
     mason.setup()
 
-    -- 2. Setup Mason-LSPConfig with "Handlers"
-    -- This automatically handles the setup for every server you install
+    -- 2. Setup Mason-LSPConfig
     mason_lspconfig.setup({
-      ensure_installed = { "lua_ls", "pyright", "ts_ls", "html", "cssls" },
+      -- CORRECTED LIST BELOW:
+      -- 1. Removed "git" (Not an LSP)
+      -- 2. Removed "gradle" (Usually 'gradle_ls', but often handled by Java LS)
+      -- 3. Confirmed "bashls" and "gopls"
+      ensure_installed = { 
+        "lua_ls", 
+        "pyright", 
+        "ts_ls", 
+        "html", 
+        "cssls", 
+        "gopls",  -- Go
+        "bashls"  -- Bash
+      },
+      
       handlers = {
-        -- The Default Handler (Applies to any server without a custom one)
+        -- The Default Handler
         function(server_name)
           lspconfig[server_name].setup({
             capabilities = capabilities,
           })
         end,
 
-        -- Custom Handler for Lua (needs special settings)
+        -- Lua Custom Handler
         ["lua_ls"] = function()
           lspconfig.lua_ls.setup({
             capabilities = capabilities,
@@ -39,11 +51,26 @@ return {
             },
           })
         end,
+
+        -- Go Custom Handler (Recommended settings)
+        ["gopls"] = function()
+          lspconfig.gopls.setup({
+            capabilities = capabilities,
+            settings = {
+              gopls = {
+                completeUnimported = true, -- Auto-import packages
+                usePlaceholders = true,
+                analyses = {
+                  unusedparams = true,
+                },
+              },
+            },
+          })
+        end,
       },
     })
 
     -- 3. Keymaps (Global LspAttach Event)
-    -- This sets the keybinds ONLY when an LSP server attaches to a buffer
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("UserLspConfig", {}),
       callback = function(ev)
